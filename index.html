@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#FAF7F2" id="themeColorMeta" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Mochila 72h" />
+  <title>Mochila de Emergencia · Control de Caducidades</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-page: #FAF7F2;
+      --bg-surface: #FFFDF9;
+      --bg-subtle: #F3EFE6;
+      --bg-input: #FAF7F2;
+      --border-soft: #E6DFD3;
+      --border-strong: #D4C9B8;
+      --text-main: #231F1D;
+      --text-secondary: #5E5650;
+      --text-muted: #8C8279;
+
+      --accent-primary: #3D5A45;
+      --accent-primary-hover: #2F4736;
+      --accent-primary-soft: #EBF1EC;
+      --accent-warm: #B86B43;
+      --accent-warm-soft: #F9EDE6;
+
+      --status-expired-bg: #FDF0ED;
+      --status-expired-border: #F2C6BC;
+      --status-expired-text: #A83827;
+      --status-expired-bar: #C84B37;
+
+      --status-soon-bg: #FEF6E7;
+      --status-soon-border: #F3D9A4;
+      --status-soon-text: #946214;
+      --status-soon-bar: #D4912A;
+
+      --status-ok-bg: #EDF4EF;
+      --status-ok-border: #C4D9C9;
+      --status-ok-text: #2E5B3E;
+      --status-ok-bar: #4B855E;
+
+      --status-none-bg: #F3EFE6;
+      --status-none-border: #DFD7C8;
+      --status-none-text: #686058;
+      --status-none-bar: #9E9488;
+
+      --shadow-card: 0 2px 12px rgba(35, 31, 29, 0.04);
+      --shadow-float: 0 12px 32px rgba(35, 31, 29, 0.14);
+      --nav-bg: rgba(255, 253, 249, 0.92);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    html[data-theme="dark"] {
+      --bg-page: #171412;
+      --bg-surface: #221D19;
+      --bg-subtle: #2C2520;
+      --bg-input: #1B1714;
+      --border-soft: #38302A;
+      --border-strong: #4B4038;
+      --text-main: #F4EFE8;
+      --text-secondary: #C6BDB2;
+      --text-muted: #93897E;
+
+      --accent-primary: #7BA687;
+      --accent-primary-hover: #8FB89A;
+      --accent-primary-soft: #233127;
+      --accent-warm: #D98A60;
+      --accent-warm-soft: #36251C;
+
+      --status-expired-bg: #36201D;
+      --status-expired-border: #5E342E;
+      --status-expired-text: #F29485;
+      --status-expired-bar: #E06855;
+
+      --status-soon-bg: #352B19;
+      --status-soon-border: #5C4926;
+      --status-soon-text: #F0C36D;
+      --status-soon-bar: #E3AA44;
+
+      --status-ok-bg: #1E2E23;
+      --status-ok-border: #334F3C;
+      --status-ok-text: #93C9A4;
+      --status-ok-bar: #68AD7E;
+
+      --status-none-bg: #2A2521;
+      --status-none-border: #423B35;
+      --status-none-text: #B5ACA2;
+      --status-none-bar: #82796F;
+
+      --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.25);
+      --shadow-float: 0 16px 36px rgba(0, 0, 0, 0.45);
+      --nav-bg: rgba(34, 29, 25, 0.92);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 18px 16px calc(92px + env(safe-area-inset-bottom));
+      transition: background-color 0.22s ease, color 0.22s ease;
+    }
+
+    .app-container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .brand-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-warm);
+      margin-bottom: 2px;
+    }
+
+    .brand-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.65rem;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-toggle, .install-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .install-btn {
+      background: var(--accent-primary);
+      color: #FFFDF9;
+      border-color: var(--accent-primary);
+    }
+
+    .theme-toggle:active, .install-btn:active {
+      transform: scale(0.97);
+    }
+
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    @media (min-width: 640px) {
+      .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 15px 16px;
+      box-shadow: var(--shadow-card);
+      text-align: left;
+      transition: transform 0.15s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .kpi-card.clickable {
+      cursor: pointer;
+      font-family: inherit;
+      color: inherit;
+      width: 100%;
+    }
+
+    .kpi-card.clickable:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .kpi-card.active-filter {
+      border-width: 2px;
+      border-color: var(--accent-primary);
+      background: var(--accent-primary-soft);
+    }
+
+    .kpi-card.active-filter[data-filter="soon"] {
+      border-color: var(--status-soon-bar);
+      background: var(--status-soon-bg);
+    }
+
+    .kpi-card.active-filter[data-filter="expired"] {
+      border-color: var(--status-expired-bar);
+      background: var(--status-expired-bg);
+    }
+
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .kpi-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .kpi-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--status-ok-bg);
+      color: var(--status-ok-text);
+    }
+
+    .kpi-badge.warn {
+      background: var(--status-expired-bg);
+      color: var(--status-expired-text);
+    }
+
+    .kpi-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .kpi-icon.ok { background: var(--status-ok-bg); color: var(--status-ok-text); }
+    .kpi-icon.soon { background: var(--status-soon-bg); color: var(--status-soon-text); }
+    .kpi-icon.expired { background: var(--status-expired-bg); color: var(--status-expired-text); }
+
+    .kpi-value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      margin-bottom: 4px;
+    }
+
+    .kpi-number {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .kpi-number.soon { color: var(--status-soon-text); }
+    .kpi-number.expired { color: var(--status-expired-text); }
+
+    .kpi-unit {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .kpi-sub {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .readiness-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-subtle);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .readiness-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      border-radius: 999px;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    .panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 18px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .panel-eyebrow {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--accent-warm);
+      margin-bottom: 2px;
+    }
+
+    .panel-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 600px) {
+      .form-grid {
+        grid-template-columns: 2fr 1.2fr;
+      }
+      .form-row-triple {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 0.8fr 1.3fr 1.4fr;
+        gap: 12px;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .field input, .field select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-input);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .field input:focus, .field select:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .checkbox-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .checkbox-inline input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-primary);
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      color: #FFFDF9;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 10px 18px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: background-color 0.15s ease, transform 0.12s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-primary-hover);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    @media (min-width: 560px) {
+      .toolbar {
+        grid-template-columns: 1.5fr 1fr;
+      }
+    }
+
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 10px 12px 10px 36px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    .toolbar select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    .active-filter-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      padding: 9px 14px;
+      margin-bottom: 12px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .active-filter-banner button {
+      background: none;
+      border: none;
+      color: var(--accent-warm);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .supply-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .supply-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-soft);
+      border-left-width: 4px;
+      border-radius: var(--radius-lg);
+      padding: 15px 16px;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.14s ease;
+    }
+
+    .supply-card.status-expired { border-left-color: var(--status-expired-bar); }
+    .supply-card.status-soon { border-left-color: var(--status-soon-bar); }
+    .supply-card.status-ok { border-left-color: var(--status-ok-bar); }
+    .supply-card.status-none { border-left-color: var(--status-none-bar); }
+
+    .supply-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .supply-title-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .supply-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-main);
+    }
+
+    .qty-pill {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status-pill {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status-expired .status-pill {
+      background: var(--status-expired-bg);
+      color: var(--status-expired-text);
+      border: 1px solid var(--status-expired-border);
+    }
+
+    .status-soon .status-pill {
+      background: var(--status-soon-bg);
+      color: var(--status-soon-text);
+      border: 1px solid var(--status-soon-border);
+    }
+
+    .status-ok .status-pill {
+      background: var(--status-ok-bg);
+      color: var(--status-ok-text);
+      border: 1px solid var(--status-ok-border);
+    }
+
+    .status-none .status-pill {
+      background: var(--status-none-bg);
+      color: var(--status-none-text);
+      border: 1px solid var(--status-none-border);
+    }
+
+    .supply-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .supply-notes {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    .shelf-meter {
+      width: 100%;
+      height: 5px;
+      background: var(--bg-subtle);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .shelf-meter-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .status-expired .shelf-meter-fill { background: var(--status-expired-bar); width: 100%; }
+    .status-soon .shelf-meter-fill { background: var(--status-soon-bar); }
+    .status-ok .shelf-meter-fill { background: var(--status-ok-bar); }
+    .status-none .shelf-meter-fill { background: var(--status-none-bar); width: 100%; opacity: 0.45; }
+
+    .supply-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .action-btn {
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-family: inherit;
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.14s ease, color 0.14s ease;
+    }
+
+    .action-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text-main);
+    }
+
+    .action-btn.danger:hover {
+      background: var(--status-expired-bg);
+      color: var(--status-expired-text);
+      border-color: var(--status-expired-border);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 36px 20px;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      color: var(--text-secondary);
+    }
+
+    .empty-state h3 {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.15rem;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .empty-state p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .data-card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .data-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-soft);
+    }
+
+    .data-item h4 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .data-item p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 9px 14px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--nav-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border-soft);
+      padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+      z-index: 40;
+    }
+
+    .bottom-nav-inner {
+      max-width: 440px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .nav-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 7px 12px;
+      border-radius: 14px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.16s ease, color 0.16s ease;
+    }
+
+    .nav-tab.active {
+      background: var(--accent-primary-soft);
+      color: var(--accent-primary);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 17, 15, 0.55);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 60;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-float);
+    }
+
+    .modal-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(82px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(16px);
+      background: var(--text-main);
+      color: var(--bg-page);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 70;
+      box-shadow: var(--shadow-float);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="top-header">
+      <div>
+        <div class="brand-eyebrow">Preparación 72h</div>
+        <h1 class="brand-title">Mochila de Emergencia</h1>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="install-btn" id="installBtn" style="display:none;">
+          <span>Instalar app</span>
+        </button>
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+          <span id="themeIcon">🌙</span>
+          <span id="themeLabel">Oscuro</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="viewMochila" class="view-section active">
+      <section class="kpi-grid" aria-label="Estado de la mochila">
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Preparación</span>
+            <span class="kpi-badge" id="readinessBadge">Óptima</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-number" id="readinessPct">100%</span>
+            <span class="kpi-unit" id="totalUnitsLabel">0 uds. en total</span>
+          </div>
+          <div class="readiness-bar">
+            <div class="readiness-fill" id="readinessFill" style="width: 100%"></div>
+          </div>
+        </div>
+
+        <button type="button" class="kpi-card clickable" data-filter="ok" id="cardFilterOk">
+          <div class="kpi-top">
+            <span class="kpi-label">Suministros</span>
+            <span class="kpi-icon ok">✓</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-number" id="totalCount">0</span>
+            <span class="kpi-unit">en mochila</span>
+          </div>
+          <div class="kpi-sub" id="okSubLabel">0 al día o sin caducidad</div>
+        </button>
+
+        <button type="button" class="kpi-card clickable" data-filter="soon" id="cardFilterSoon">
+          <div class="kpi-top">
+            <span class="kpi-label">Próximos (≤ 30d)</span>
+            <span class="kpi-icon soon">◷</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-number soon" id="soonCount">0</span>
+            <span class="kpi-unit">revisar pronto</span>
+          </div>
+          <div class="kpi-sub">Aviso preventivo 30 días</div>
+        </button>
+
+        <button type="button" class="kpi-card clickable" data-filter="expired" id="cardFilterExpired">
+          <div class="kpi-top">
+            <span class="kpi-label">Caducados</span>
+            <span class="kpi-icon expired">!</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-number expired" id="expiredCount">0</span>
+            <span class="kpi-unit">reemplazar</span>
+          </div>
+          <div class="kpi-sub">Prioridad principal arriba</div>
+        </button>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-eyebrow">Registro</div>
+            <h2 class="panel-title">Añadir suministro</h2>
+          </div>
+        </div>
+        <form id="addForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="itemName">Artículo *</label>
+              <input type="text" id="itemName" placeholder="Ej. Agua mineral 1.5L, Ibuprofeno..." required />
+            </div>
+            <div class="field">
+              <label for="itemCategory">Categoría</label>
+              <select id="itemCategory">
+                <option value="Agua e hidratación">Agua e hidratación</option>
+                <option value="Alimentación">Alimentación</option>
+                <option value="Botiquín y salud">Botiquín y salud</option>
+                <option value="Energía e iluminación">Energía e iluminación</option>
+                <option value="Herramientas y refugio">Herramientas y refugio</option>
+                <option value="Documentación y efectivo">Documentación y efectivo</option>
+                <option value="Higiene y otros">Higiene y otros</option>
+              </select>
+            </div>
+            <div class="form-row-triple">
+              <div class="field">
+                <label for="itemQty">Cantidad</label>
+                <input type="number" id="itemQty" min="1" value="1" required />
+              </div>
+              <div class="field">
+                <label for="itemExpiry">Caducidad</label>
+                <input type="date" id="itemExpiry" />
+              </div>
+              <div class="field">
+                <label for="itemNotes">Nota / Ubicación</label>
+                <input type="text" id="itemNotes" placeholder="Bolsillo frontal, lote..." />
+              </div>
+            </div>
+          </div>
+          <div class="form-footer">
+            <label class="checkbox-inline">
+              <input type="checkbox" id="itemNoExpiry" />
+              <span>Sin fecha de caducidad</span>
+            </label>
+            <button type="submit" class="btn-primary">+ Guardar en mochila</button>
+          </div>
+        </form>
+      </section>
+
+      <section aria-label="Inventario ordenado">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="search" id="searchInput" placeholder="Buscar suministro o nota..." />
+          </div>
+          <select id="categoryFilter" aria-label="Filtrar por categoría">
+            <option value="ALL">Todas las categorías</option>
+            <option value="Agua e hidratación">Agua e hidratación</option>
+            <option value="Alimentación">Alimentación</option>
+            <option value="Botiquín y salud">Botiquín y salud</option>
+            <option value="Energía e iluminación">Energía e iluminación</option>
+            <option value="Herramientas y refugio">Herramientas y refugio</option>
+            <option value="Documentación y efectivo">Documentación y efectivo</option>
+            <option value="Higiene y otros">Higiene y otros</option>
+          </select>
+        </div>
+
+        <div class="active-filter-banner" id="activeFilterBanner" style="display:none;">
+          <span id="activeFilterText">Mostrando filtro</span>
+          <button type="button" id="clearStatusFilter">Ver todos</button>
+        </div>
+
+        <div class="supply-list" id="supplyList"></div>
+      </section>
+    </main>
+
+    <section id="viewDatos" class="view-section" aria-label="Copia de seguridad y datos">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-eyebrow">Portabilidad</div>
+            <h2 class="panel-title">Copia de seguridad y datos</h2>
+          </div>
+        </div>
+        <div class="data-card-list">
+          <div class="data-item">
+            <div>
+              <h4>Exportar inventario (JSON)</h4>
+              <p>Descarga una copia completa de tu mochila para guardarla o pasarla a otro dispositivo.</p>
+            </div>
+            <button type="button" class="btn-secondary" id="exportBtn">Exportar</button>
+          </div>
+          <div class="data-item">
+            <div>
+              <h4>Importar inventario (JSON)</h4>
+              <p>Restaura suministros desde un archivo de copia de seguridad guardado anteriormente.</p>
+            </div>
+            <button type="button" class="btn-secondary" id="importBtn">Importar</button>
+            <input type="file" id="importFile" accept=".json,application/json" style="display:none;" />
+          </div>
+          <div class="data-item">
+            <div>
+              <h4>Cargar kit de ejemplo 72h</h4>
+              <p>Añade artículos básicos recomendados (agua, barritas, botiquín, linterna, pilas) si estás empezando.</p>
+            </div>
+            <button type="button" class="btn-secondary" id="seedBtn">Cargar kit</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <div class="bottom-nav-inner">
+      <button type="button" class="nav-tab active" data-view="viewMochila">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 6V5a3 3 0 0 1 6 0v1"></path>
+          <rect x="4" y="6" width="16" height="15" rx="4"></rect>
+          <path d="M8 12h8"></path>
+        </svg>
+        <span>Mochila</span>
+      </button>
+      <button type="button" class="nav-tab" data-view="viewDatos">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>Copia / Datos</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal-card">
+      <h3 class="modal-title">Editar suministro</h3>
+      <form id="editForm">
+        <input type="hidden" id="editId" />
+        <div class="form-grid">
+          <div class="field">
+            <label for="editName">Artículo *</label>
+            <input type="text" id="editName" required />
+          </div>
+          <div class="field">
+            <label for="editCategory">Categoría</label>
+            <select id="editCategory">
+              <option value="Agua e hidratación">Agua e hidratación</option>
+              <option value="Alimentación">Alimentación</option>
+              <option value="Botiquín y salud">Botiquín y salud</option>
+              <option value="Energía e iluminación">Energía e iluminación</option>
+              <option value="Herramientas y refugio">Herramientas y refugio</option>
+              <option value="Documentación y efectivo">Documentación y efectivo</option>
+              <option value="Higiene y otros">Higiene y otros</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="editQty">Cantidad</label>
+            <input type="number" id="editQty" min="1" required />
+          </div>
+          <div class="field">
+            <label for="editExpiry">Caducidad</label>
+            <input type="date" id="editExpiry" />
+          </div>
+          <div class="field">
+            <label for="editNotes">Nota / Ubicación</label>
+            <input type="text" id="editNotes" />
+          </div>
+        </div>
+        <div class="form-footer">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="editNoExpiry" />
+            <span>Sin fecha de caducidad</span>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancelEditBtn">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="deleteModal">
+    <div class="modal-card">
+      <h3 class="modal-title">Eliminar suministro</h3>
+      <p style="font-size:0.9rem;color:var(--text-secondary);" id="deleteMessage">¿Seguro que quieres quitar este artículo de la mochila?</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="cancelDeleteBtn">Cancelar</button>
+        <button type="button" class="btn-primary" style="background:var(--status-expired-bar);" id="confirmDeleteBtn">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'mochila_emergencia_items_v1';
+    const THEME_KEY = 'mochila_emergencia_theme_v1';
+
+    let items = [];
+    let statusFilter = 'ALL';
+    let pendingDeleteId = null;
+    let deferredInstallPrompt = null;
+
+    function startOfToday() {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }
+
+    function parseLocalDate(isoStr) {
+      if (!isoStr) return null;
+      const [y, m, d] = isoStr.split('-').map(Number);
+      if (!y || !m || !d) return null;
+      return new Date(y, m - 1, d);
+    }
+
+    function toIsoDate(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatDisplayDate(isoStr) {
+      const dt = parseLocalDate(isoStr);
+      if (!dt) return 'Sin caducidad';
+      return dt.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function addMonthsIso(baseIso, months) {
+      const start = parseLocalDate(baseIso);
+      const today = startOfToday();
+      const ref = start && start > today ? start : today;
+      const target = new Date(ref.getFullYear(), ref.getMonth() + months, ref.getDate());
+      return toIsoDate(target);
+    }
+
+    function getStatusInfo(expiryIso) {
+      if (!expiryIso) {
+        return { key: 'none', priority: 3, days: Infinity, label: 'Sin caducidad', pct: 100 };
+      }
+      const exp = parseLocalDate(expiryIso);
+      const today = startOfToday();
+      const diffDays = Math.round((exp - today) / 86400000);
+
+      if (diffDays < 0) {
+        const abs = Math.abs(diffDays);
+        return {
+          key: 'expired',
+          priority: 0,
+          days: diffDays,
+          label: abs === 1 ? 'Caducó ayer' : `Caducado hace ${abs}d`,
+          pct: 100
+        };
+      }
+      if (diffDays === 0) {
+        return { key: 'expired', priority: 0, days: 0, label: 'Caduca hoy', pct: 100 };
+      }
+      if (diffDays <= 30) {
+        return {
+          key: 'soon',
+          priority: 1,
+          days: diffDays,
+          label: diffDays === 1 ? 'En 1 día' : `En ${diffDays} días`,
+          pct: Math.max(12, Math.round((diffDays / 30) * 100))
+        };
+      }
+      const months = Math.floor(diffDays / 30);
+      const label = months >= 12
+        ? `En ${Math.floor(months / 12)}a ${months % 12}m`
+        : `En ${diffDays} días`;
+      return {
+        key: 'ok',
+        priority: 2,
+        days: diffDays,
+        label,
+        pct: Math.min(100, Math.max(25, Math.round((diffDays / 365) * 100)))
+      };
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(el._timer);
+      el._timer = setTimeout(() => el.classList.remove('show'), 2300);
+    }
+
+    function saveItems() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function loadItems() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            items = parsed;
+            return;
+          }
+        }
+      } catch (e) {}
+      items = getSeedItems();
+      saveItems();
+    }
+
+    function getSeedItems() {
+      return [
+        { id: crypto.randomUUID(), name: 'Agua embotellada (4 × 1.5L)', category: 'Agua e hidratación', qty: 4, expiry: addMonthsIso('', 8), notes: 'Compartimento principal' },
+        { id: crypto.randomUUID(), name: 'Barritas energéticas', category: 'Alimentación', qty: 6, expiry: addMonthsIso('', 1), notes: 'Bolsillo superior' },
+        { id: crypto.randomUUID(), name: 'Ibuprofeno 600 mg + gasas', category: 'Botiquín y salud', qty: 1, expiry: addMonthsIso('', 14), notes: 'Necesario revisar prospecto' },
+        { id: crypto.randomUUID(), name: 'Pilas alcalinas AA (pack 4)', category: 'Energía e iluminación', qty: 2, expiry: addMonthsIso('', 24), notes: 'Bolsa estanca' },
+        { id: crypto.randomUUID(), name: 'Linterna LED + silbato', category: 'Herramientas y refugio', qty: 1, expiry: '', notes: 'Mosquetón lateral' },
+        { id: crypto.randomUUID(), name: 'Copia DNI y efectivo', category: 'Documentación y efectivo', qty: 1, expiry: '', notes: 'Funda impermeable' }
+      ];
+    }
+
+    function render() {
+      const search = document.getElementById('searchInput').value.trim().toLowerCase();
+      const cat = document.getElementById('categoryFilter').value;
+
+      let expired = 0;
+      let soon = 0;
+      let okOrNone = 0;
+      let totalUnits = 0;
+
+      items.forEach(item => {
+        const st = getStatusInfo(item.expiry);
+        totalUnits += Number(item.qty) || 1;
+        if (st.key === 'expired') expired++;
+        else if (st.key === 'soon') soon++;
+        else okOrNone++;
+      });
+
+      const total = items.length;
+      const readyCount = total - expired;
+      const pct = total === 0 ? 100 : Math.round((readyCount / total) * 100);
+
+      document.getElementById('readinessPct').textContent = `${pct}%`;
+      document.getElementById('totalUnitsLabel').textContent = `${totalUnits} uds. en total`;
+      document.getElementById('readinessFill').style.width = `${pct}%`;
+      document.getElementById('readinessFill').style.backgroundColor = expired > 0 ? 'var(--status-expired-bar)' : 'var(--accent-primary)';
+
+      const badge = document.getElementById('readinessBadge');
+      if (expired > 0) {
+        badge.textContent = 'Revisar caducados';
+        badge.classList.add('warn');
+      } else if (soon > 0) {
+        badge.textContent = 'Atención próxima';
+        badge.classList.remove('warn');
+      } else {
+        badge.textContent = 'Lista';
+        badge.classList.remove('warn');
+      }
+
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('okSubLabel').textContent = `${okOrNone} al día o sin caducidad`;
+      document.getElementById('soonCount').textContent = soon;
+      document.getElementById('expiredCount').textContent = expired;
+
+      document.querySelectorAll('.kpi-card.clickable').forEach(btn => {
+        btn.classList.toggle('active-filter', btn.dataset.filter === statusFilter);
+      });
+
+      const banner = document.getElementById('activeFilterBanner');
+      if (statusFilter !== 'ALL') {
+        banner.style.display = 'flex';
+        const names = {
+          ok: 'Suministros al día o sin caducidad',
+          soon: 'Suministros próximos a caducar (≤ 30 días)',
+          expired: 'Suministros caducados o que caducan hoy'
+        };
+        document.getElementById('activeFilterText').textContent = `Filtro: ${names[statusFilter]}`;
+      } else {
+        banner.style.display = 'none';
+      }
+
+      const sorted = [...items]
+        .map(item => ({ ...item, status: getStatusInfo(item.expiry) }))
+        .filter(item => {
+          if (statusFilter === 'ok' && item.status.key !== 'ok' && item.status.key !== 'none') return false;
+          if (statusFilter === 'soon' && item.status.key !== 'soon') return false;
+          if (statusFilter === 'expired' && item.status.key !== 'expired') return false;
+          if (cat !== 'ALL' && item.category !== cat) return false;
+          if (search) {
+            const hay = `${item.name} ${item.category} ${item.notes || ''}`.toLowerCase();
+            if (!hay.includes(search)) return false;
+          }
+          return true;
+        })
+        .sort((a, b) => {
+          if (a.status.priority !== b.status.priority) return a.status.priority - b.status.priority;
+          if (a.status.days !== b.status.days) return a.status.days - b.status.days;
+          return a.name.localeCompare(b.name, 'es');
+        });
+
+      const listEl = document.getElementById('supplyList');
+      if (sorted.length === 0) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <h3>No hay suministros en esta vista</h3>
+            <p>Añade un artículo arriba o limpia los filtros activos para ver toda la mochila.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = sorted.map(item => `
+        <article class="supply-card status-${item.status.key}">
+          <div class="supply-top">
+            <div class="supply-title-row">
+              <span class="supply-name">${escapeHtml(item.name)}</span>
+              <span class="qty-pill">×${Number(item.qty) || 1}</span>
+            </div>
+            <span class="status-pill">${item.status.label}</span>
+          </div>
+          <div class="supply-meta">
+            <span>${escapeHtml(item.category)}</span>
+            <span>·</span>
+            <span>Caducidad: <strong>${formatDisplayDate(item.expiry)}</strong></span>
+          </div>
+          ${item.notes ? `<div class="supply-notes">${escapeHtml(item.notes)}</div>` : ''}
+          <div class="shelf-meter">
+            <div class="shelf-meter-fill" style="width:${item.status.pct}%"></div>
+          </div>
+          <div class="supply-actions">
+            <button type="button" class="action-btn" data-act="plus6" data-id="${item.id}">+6m</button>
+            <button type="button" class="action-btn" data-act="plus12" data-id="${item.id}">+1a</button>
+            <button type="button" class="action-btn" data-act="edit" data-id="${item.id}">Editar</button>
+            <button type="button" class="action-btn danger" data-act="delete" data-id="${item.id}">Borrar</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem(THEME_KEY, theme);
+      const isDark = theme === 'dark';
+      document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+      document.getElementById('themeLabel').textContent = isDark ? 'Claro' : 'Oscuro';
+      document.getElementById('themeColorMeta').setAttribute('content', isDark ? '#171412' : '#FAF7F2');
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem(THEME_KEY);
+      if (saved === 'dark' || saved === 'light') {
+        applyTheme(saved);
+        return;
+      }
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyTheme(prefersDark ? 'dark' : 'light');
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    document.querySelectorAll('.kpi-card.clickable').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.filter;
+        statusFilter = statusFilter === target ? 'ALL' : target;
+        render();
+      });
+    });
+
+    document.getElementById('clearStatusFilter').addEventListener('click', () => {
+      statusFilter = 'ALL';
+      render();
+    });
+
+    document.getElementById('itemNoExpiry').addEventListener('change', e => {
+      const exp = document.getElementById('itemExpiry');
+      exp.disabled = e.target.checked;
+      if (e.target.checked) exp.value = '';
+    });
+
+    document.getElementById('addForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('itemName').value.trim();
+      if (!name) return;
+      const noExp = document.getElementById('itemNoExpiry').checked;
+      const expiry = noExp ? '' : document.getElementById('itemExpiry').value;
+
+      items.push({
+        id: crypto.randomUUID(),
+        name,
+        category: document.getElementById('itemCategory').value,
+        qty: Math.max(1, parseInt(document.getElementById('itemQty').value, 10) || 1),
+        expiry,
+        notes: document.getElementById('itemNotes').value.trim()
+      });
+
+      saveItems();
+      e.target.reset();
+      document.getElementById('itemExpiry').disabled = false;
+      render();
+      showToast('Suministro añadido');
+    });
+
+    document.getElementById('searchInput').addEventListener('input', render);
+    document.getElementById('categoryFilter').addEventListener('change', render);
+
+    document.getElementById('supplyList').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const act = btn.dataset.act;
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+
+      if (act === 'plus6' || act === 'plus12') {
+        const months = act === 'plus6' ? 6 : 12;
+        item.expiry = addMonthsIso(item.expiry, months);
+        saveItems();
+        render();
+        showToast(`Caducidad renovada (+${months} meses)`);
+      } else if (act === 'edit') {
+        document.getElementById('editId').value = item.id;
+        document.getElementById('editName').value = item.name;
+        document.getElementById('editCategory').value = item.category;
+        document.getElementById('editQty').value = item.qty;
+        document.getElementById('editNotes').value = item.notes || '';
+        const noExp = !item.expiry;
+        document.getElementById('editNoExpiry').checked = noExp;
+        const expInput = document.getElementById('editExpiry');
+        expInput.disabled = noExp;
+        expInput.value = item.expiry || '';
+        document.getElementById('editModal').classList.add('open');
+      } else if (act === 'delete') {
+        pendingDeleteId = item.id;
+        document.getElementById('deleteMessage').textContent = `¿Seguro que quieres quitar "${item.name}" de la mochila?`;
+        document.getElementById('deleteModal').classList.add('open');
+      }
+    });
+
+    document.getElementById('editNoExpiry').addEventListener('change', e => {
+      const exp = document.getElementById('editExpiry');
+      exp.disabled = e.target.checked;
+      if (e.target.checked) exp.value = '';
+    });
+
+    document.getElementById('cancelEditBtn').addEventListener('click', () => {
+      document.getElementById('editModal').classList.remove('open');
+    });
+
+    document.getElementById('editForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+      const noExp = document.getElementById('editNoExpiry').checked;
+      item.name = document.getElementById('editName').value.trim();
+      item.category = document.getElementById('editCategory').value;
+      item.qty = Math.max(1, parseInt(document.getElementById('editQty').value, 10) || 1);
+      item.expiry = noExp ? '' : document.getElementById('editExpiry').value;
+      item.notes = document.getElementById('editNotes').value.trim();
+      saveItems();
+      document.getElementById('editModal').classList.remove('open');
+      render();
+      showToast('Cambios guardados');
+    });
+
+    document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+      pendingDeleteId = null;
+      document.getElementById('deleteModal').classList.remove('open');
+    });
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+      if (pendingDeleteId) {
+        items = items.filter(i => i.id !== pendingDeleteId);
+        saveItems();
+        render();
+        showToast('Suministro eliminado');
+      }
+      pendingDeleteId = null;
+      document.getElementById('deleteModal').classList.remove('open');
+    });
+
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = tab.dataset.view;
+        document.querySelectorAll('.view-section').forEach(sec => {
+          sec.classList.toggle('active', sec.id === target);
+        });
+      });
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mochila-emergencia-${toIsoDate(startOfToday())}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Copia JSON descargada');
+    });
+
+    document.getElementById('importBtn').addEventListener('click', () => {
+      document.getElementById('importFile').click();
+    });
+
+    document.getElementById('importFile').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (!Array.isArray(data)) throw new Error();
+          items = data.map(row => ({
+            id: row.id || crypto.randomUUID(),
+            name: String(row.name || 'Artículo'),
+            category: String(row.category || 'Higiene y otros'),
+            qty: Math.max(1, parseInt(row.qty, 10) || 1),
+            expiry: row.expiry || '',
+            notes: row.notes || ''
+          }));
+          saveItems();
+          render();
+          showToast('Inventario importado');
+        } catch (err) {
+          showToast('Archivo JSON no válido');
+        }
+        e.target.value = '';
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('seedBtn').addEventListener('click', () => {
+      items = [...items, ...getSeedItems()];
+      saveItems();
+      render();
+      showToast('Kit de ejemplo añadido');
+    });
+
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      document.getElementById('installBtn').style.display = 'inline-flex';
+    });
+
+    document.getElementById('installBtn').addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      const { outcome } = await deferredInstallPrompt.userChoice;
+      if (outcome === 'accepted') {
+        document.getElementById('installBtn').style.display = 'none';
+      }
+      deferredInstallPrompt = null;
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    initTheme();
+    loadItems();
+    render();
+  </script>
+</body>
+</html>
