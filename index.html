@@ -196,6 +196,62 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    .bag-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 11px 14px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 14px;
+    }
+
+    .bag-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .bag-bar-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .bag-select {
+      flex: 1;
+      max-width: 300px;
+      padding: 8px 11px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-soft);
+      background: var(--bg-input);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .bag-select:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .bag-bar-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -352,6 +408,95 @@
       justify-content: space-between;
       gap: 10px;
       margin-bottom: 14px;
+    }
+
+    .fab-add-btn {
+      position: fixed;
+      right: 18px;
+      bottom: calc(78px + env(safe-area-inset-bottom));
+      width: 52px;
+      height: 52px;
+      padding: 0;
+      border-radius: 50%;
+      border: 1px solid var(--border-strong);
+      background: var(--accent-primary);
+      color: #FFFDF9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 45;
+      box-shadow: var(--shadow-float);
+      transition: background-color 0.16s ease, transform 0.16s ease;
+    }
+
+    .fab-add-btn svg {
+      width: 24px;
+      height: 24px;
+      display: block;
+      pointer-events: none;
+    }
+
+    .fab-add-btn:hover {
+      background: var(--accent-primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .fab-add-btn:active {
+      transform: scale(0.95);
+    }
+
+    .add-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 17, 15, 0.52);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 12px 12px calc(76px + env(safe-area-inset-bottom));
+      z-index: 55;
+    }
+
+    .add-drawer-backdrop.open {
+      display: flex;
+      animation: fadeIn 0.16s ease;
+    }
+
+    .add-drawer-card {
+      width: 100%;
+      max-width: 640px;
+      max-height: 82vh;
+      overflow-y: auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow-float);
+      margin-bottom: 0;
+    }
+
+    .drawer-close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 1.15rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .drawer-close-btn:hover {
+      color: var(--text-main);
+      border-color: var(--border-strong);
     }
 
     .panel-eyebrow {
@@ -878,6 +1023,17 @@
     </header>
 
     <main id="viewMochila" class="view-section active">
+      <section class="bag-bar" aria-label="Selector de mochilas">
+        <div class="bag-bar-left">
+          <label for="bagSelect" class="bag-bar-label">Mochila</label>
+          <select id="bagSelect" class="bag-select" aria-label="Seleccionar mochila"></select>
+        </div>
+        <div class="bag-bar-actions">
+          <button type="button" class="action-btn" id="newBagBtn">+ Nueva mochila</button>
+          <button type="button" class="action-btn" id="renameBagBtn">Renombrar</button>
+          <button type="button" class="action-btn danger" id="deleteBagBtn">Borrar mochila</button>
+        </div>
+      </section>
       <section class="kpi-grid" aria-label="Estado de la mochila">
         <div class="kpi-card">
           <div class="kpi-top">
@@ -930,55 +1086,12 @@
         </button>
       </section>
 
-      <section class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-eyebrow">Registro</div>
-            <h2 class="panel-title">Añadir suministro</h2>
-          </div>
-        </div>
-        <form id="addForm">
-          <div class="form-grid">
-            <div class="field">
-              <label for="itemName">Artículo *</label>
-              <input type="text" id="itemName" placeholder="Ej. Agua mineral 1.5L, Ibuprofeno..." required />
-            </div>
-            <div class="field">
-              <label for="itemCategory">Categoría</label>
-              <select id="itemCategory">
-                <option value="Agua e hidratación">Agua e hidratación</option>
-                <option value="Alimentación">Alimentación</option>
-                <option value="Botiquín y salud">Botiquín y salud</option>
-                <option value="Energía e iluminación">Energía e iluminación</option>
-                <option value="Herramientas y refugio">Herramientas y refugio</option>
-                <option value="Documentación y efectivo">Documentación y efectivo</option>
-                <option value="Higiene y otros">Higiene y otros</option>
-              </select>
-            </div>
-            <div class="form-row-triple">
-              <div class="field">
-                <label for="itemQty">Cantidad</label>
-                <input type="number" id="itemQty" min="1" value="1" required />
-              </div>
-              <div class="field">
-                <label for="itemExpiry">Caducidad</label>
-                <input type="date" id="itemExpiry" />
-              </div>
-              <div class="field">
-                <label for="itemNotes">Nota / Ubicación</label>
-                <input type="text" id="itemNotes" placeholder="Bolsillo frontal, lote..." />
-              </div>
-            </div>
-          </div>
-          <div class="form-footer">
-            <label class="checkbox-inline">
-              <input type="checkbox" id="itemNoExpiry" />
-              <span>Sin fecha de caducidad</span>
-            </label>
-            <button type="submit" class="btn-primary">+ Guardar en mochila</button>
-          </div>
-        </form>
-      </section>
+      <button type="button" class="fab-add-btn" id="toggleAddPanelBtn" aria-expanded="false" aria-controls="addSupplyDrawer" aria-label="Añadir suministro">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
 
       <section aria-label="Inventario ordenado">
         <div class="toolbar">
@@ -1127,12 +1240,86 @@
     </div>
   </div>
 
+    <div class="add-drawer-backdrop" id="addSupplyDrawer" role="dialog" aria-modal="true" aria-labelledby="addDrawerTitle">
+    <div class="add-drawer-card">
+      <div class="panel-header">
+        <div>
+          <div class="panel-eyebrow">Registro</div>
+          <h2 class="panel-title" id="addDrawerTitle">Añadir suministro</h2>
+        </div>
+        <button type="button" class="drawer-close-btn" id="closeAddDrawerBtn" aria-label="Cerrar desplegable">✕</button>
+      </div>
+      <form id="addForm">
+        <div class="form-grid">
+          <div class="field">
+            <label for="itemName">Artículo *</label>
+            <input type="text" id="itemName" placeholder="Ej. Agua mineral 1.5L, Ibuprofeno..." required />
+          </div>
+          <div class="field">
+            <label for="itemCategory">Categoría</label>
+            <select id="itemCategory">
+              <option value="Agua e hidratación">Agua e hidratación</option>
+              <option value="Alimentación">Alimentación</option>
+              <option value="Botiquín y salud">Botiquín y salud</option>
+              <option value="Energía e iluminación">Energía e iluminación</option>
+              <option value="Herramientas y refugio">Herramientas y refugio</option>
+              <option value="Documentación y efectivo">Documentación y efectivo</option>
+              <option value="Higiene y otros">Higiene y otros</option>
+            </select>
+          </div>
+          <div class="form-row-triple">
+            <div class="field">
+              <label for="itemQty">Cantidad</label>
+              <input type="number" id="itemQty" min="1" value="1" required />
+            </div>
+            <div class="field">
+              <label for="itemExpiry">Caducidad</label>
+              <input type="date" id="itemExpiry" />
+            </div>
+            <div class="field">
+              <label for="itemNotes">Nota / Ubicación</label>
+              <input type="text" id="itemNotes" placeholder="Bolsillo frontal, lote..." />
+            </div>
+          </div>
+        </div>
+        <div class="form-footer">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="itemNoExpiry" />
+            <span>Sin fecha de caducidad</span>
+          </label>
+          <button type="submit" class="btn-primary">+ Guardar en mochila</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="bagModal">
+    <div class="modal-card">
+      <h3 class="modal-title" id="bagModalTitle">Nueva mochila</h3>
+      <form id="bagForm">
+        <div class="field">
+          <label for="bagNameInput">Nombre de la mochila *</label>
+          <input type="text" id="bagNameInput" placeholder="Ej. Mochila coche, Mochila casa, Mochila Míriam..." required />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancelBagBtn">Cancelar</button>
+          <button type="submit" class="btn-primary" id="saveBagBtn">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
     const STORAGE_KEY = 'mochila_emergencia_items_v1';
+    const BAGS_KEY = 'mochila_emergencia_bags_v1';
+    const ACTIVE_BAG_KEY = 'mochila_emergencia_active_bag_v1';
     const THEME_KEY = 'mochila_emergencia_theme_v1';
 
+    let bags = [];
+    let activeBagId = null;
+    let bagModalMode = 'create';
     let items = [];
     let statusFilter = 'ALL';
     let pendingDeleteId = null;
@@ -1222,23 +1409,81 @@
       el._timer = setTimeout(() => el.classList.remove('show'), 2300);
     }
 
+    function syncBagsStorage() {
+      localStorage.setItem(BAGS_KEY, JSON.stringify(bags));
+      if (activeBagId) {
+        localStorage.setItem(ACTIVE_BAG_KEY, activeBagId);
+      }
+    }
+
+    function renderBagSelect() {
+      const sel = document.getElementById('bagSelect');
+      if (!sel) return;
+      sel.innerHTML = bags.map(b => `<option value="${escapeHtml(b.id)}">${escapeHtml(b.name)}</option>`).join('');
+      if (activeBagId) {
+        sel.value = activeBagId;
+      }
+      const deleteBtn = document.getElementById('deleteBagBtn');
+      if (deleteBtn) {
+        deleteBtn.disabled = bags.length <= 1;
+        deleteBtn.style.opacity = bags.length <= 1 ? '0.45' : '1';
+      }
+    }
+
     function saveItems() {
+      const currentBag = bags.find(b => b.id === activeBagId);
+      if (currentBag) {
+        currentBag.items = items;
+      }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      syncBagsStorage();
     }
 
     function loadItems() {
+      let legacyItems = null;
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            items = parsed;
+        const rawLegacy = localStorage.getItem(STORAGE_KEY);
+        if (rawLegacy) {
+          const parsedLegacy = JSON.parse(rawLegacy);
+          if (Array.isArray(parsedLegacy)) {
+            legacyItems = parsedLegacy;
+          }
+        }
+      } catch (e) {}
+
+      try {
+        const rawBags = localStorage.getItem(BAGS_KEY);
+        if (rawBags) {
+          const parsedBags = JSON.parse(rawBags);
+          if (Array.isArray(parsedBags) && parsedBags.length > 0) {
+            bags = parsedBags.map(b => ({
+              id: b.id || crypto.randomUUID(),
+              name: String(b.name || 'Mochila'),
+              items: Array.isArray(b.items) ? b.items : []
+            }));
+            const savedActive = localStorage.getItem(ACTIVE_BAG_KEY);
+            const found = bags.find(b => b.id === savedActive) || bags[0];
+            activeBagId = found.id;
+            items = Array.isArray(found.items) ? found.items : [];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+            syncBagsStorage();
+            renderBagSelect();
             return;
           }
         }
       } catch (e) {}
-      items = getSeedItems();
+
+      const initialItems = legacyItems !== null ? legacyItems : getSeedItems();
+      const defaultBag = {
+        id: crypto.randomUUID(),
+        name: 'Mochila principal',
+        items: initialItems
+      };
+      bags = [defaultBag];
+      activeBagId = defaultBag.id;
+      items = initialItems;
       saveItems();
+      renderBagSelect();
     }
 
     function getSeedItems() {
@@ -1421,6 +1666,32 @@
       if (e.target.checked) exp.value = '';
     });
 
+    const toggleAddPanelBtn = document.getElementById('toggleAddPanelBtn');
+    const addSupplyDrawer = document.getElementById('addSupplyDrawer');
+    const closeAddDrawerBtn = document.getElementById('closeAddDrawerBtn');
+
+    function setAddPanelOpen(open) {
+      addSupplyDrawer.classList.toggle('open', open);
+      toggleAddPanelBtn.setAttribute('aria-expanded', String(open));
+      if (open) {
+        setTimeout(() => document.getElementById('itemName').focus(), 60);
+      }
+    }
+
+    toggleAddPanelBtn.addEventListener('click', () => {
+      setAddPanelOpen(!addSupplyDrawer.classList.contains('open'));
+    });
+
+    closeAddDrawerBtn.addEventListener('click', () => {
+      setAddPanelOpen(false);
+    });
+
+    addSupplyDrawer.addEventListener('click', e => {
+      if (e.target === addSupplyDrawer) {
+        setAddPanelOpen(false);
+      }
+    });
+
     document.getElementById('addForm').addEventListener('submit', e => {
       e.preventDefault();
       const name = document.getElementById('itemName').value.trim();
@@ -1440,6 +1711,7 @@
       saveItems();
       e.target.reset();
       document.getElementById('itemExpiry').disabled = false;
+      setAddPanelOpen(false);
       render();
       showToast('Suministro añadido');
     });
@@ -1604,6 +1876,96 @@
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
+
+    document.getElementById('bagSelect').addEventListener('change', e => {
+      const nextBag = bags.find(b => b.id === e.target.value);
+      if (!nextBag) return;
+      activeBagId = nextBag.id;
+      items = Array.isArray(nextBag.items) ? nextBag.items : [];
+      statusFilter = 'ALL';
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      syncBagsStorage();
+      renderBagSelect();
+      render();
+      showToast(`Mochila: ${nextBag.name}`);
+    });
+
+    const bagModal = document.getElementById('bagModal');
+    const bagNameInput = document.getElementById('bagNameInput');
+
+    function openBagModal(mode) {
+      bagModalMode = mode;
+      const currentBag = bags.find(b => b.id === activeBagId);
+      document.getElementById('bagModalTitle').textContent = mode === 'create' ? 'Nueva mochila' : 'Renombrar mochila';
+      document.getElementById('saveBagBtn').textContent = mode === 'create' ? 'Crear mochila' : 'Guardar nombre';
+      bagNameInput.value = mode === 'rename' && currentBag ? currentBag.name : '';
+      bagModal.classList.add('open');
+      setTimeout(() => bagNameInput.focus(), 60);
+    }
+
+    document.getElementById('newBagBtn').addEventListener('click', () => openBagModal('create'));
+    document.getElementById('renameBagBtn').addEventListener('click', () => openBagModal('rename'));
+
+    document.getElementById('cancelBagBtn').addEventListener('click', () => {
+      bagModal.classList.remove('open');
+    });
+
+    bagModal.addEventListener('click', e => {
+      if (e.target === bagModal) {
+        bagModal.classList.remove('open');
+      }
+    });
+
+    document.getElementById('bagForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name = bagNameInput.value.trim();
+      if (!name) return;
+
+      if (bagModalMode === 'create') {
+        const newBag = {
+          id: crypto.randomUUID(),
+          name,
+          items: []
+        };
+        bags.push(newBag);
+        activeBagId = newBag.id;
+        items = [];
+        statusFilter = 'ALL';
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        syncBagsStorage();
+        renderBagSelect();
+        render();
+        showToast(`Mochila "${name}" creada`);
+      } else {
+        const currentBag = bags.find(b => b.id === activeBagId);
+        if (currentBag) {
+          currentBag.name = name;
+          syncBagsStorage();
+          renderBagSelect();
+          showToast('Nombre actualizado');
+        }
+      }
+      bagModal.classList.remove('open');
+    });
+
+    document.getElementById('deleteBagBtn').addEventListener('click', () => {
+      if (bags.length <= 1) {
+        showToast('Debe quedar al menos una mochila');
+        return;
+      }
+      const currentBag = bags.find(b => b.id === activeBagId);
+      if (!currentBag) return;
+      if (!confirm(`¿Borrar la mochila "${currentBag.name}" y todos sus suministros?`)) return;
+      bags = bags.filter(b => b.id !== activeBagId);
+      activeBagId = bags[0].id;
+      items = Array.isArray(bags[0].items) ? bags[0].items : [];
+      statusFilter = 'ALL';
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      syncBagsStorage();
+      renderBagSelect();
+      render();
+      showToast('Mochila eliminada');
+    });
 
     initTheme();
     loadItems();
